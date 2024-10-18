@@ -13,6 +13,7 @@ env/
 .venv/
 .ENV/
 .env/
+.env
 
 # Distribution / packaging
 .Python
