@@ -14,14 +14,6 @@ def main():
     dtu = testing_data.loc[0:3]
     evaluator = Evaluator(dtu)
     evaluator.llm()
-    
-
-    
-
-
-
-
-
 
 
     print("done")
