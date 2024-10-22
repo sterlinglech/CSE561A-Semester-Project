@@ -1,6 +1,5 @@
 from rouge_score import rouge_scorer
 import bert_score
-from transformers import pipeline
 import openai
 from dotenv import dotenv_values
 from tqdm import tqdm
@@ -49,7 +48,10 @@ class Evaluator:
             overall_response = openai.chat.completions.create(model="gpt-3.5-turbo", messages=[{"role": "user", "content": f"Reference Summary: {self.dataframe.loc[i]['reference_summary']}"}, {"role": "user", "content": f"Generated Summary: {self.dataframe.loc[i]['generated_summary']}"}, {"role": "user", "content": overall_prompt}])
             precision_score = float(precision_response.choices[0].message.content)
             recall_score = float(recall_response.choices[0].message.content)
-            fmeasure_score = 2 * ((precision_score * recall_score) / (precision_score + recall_score))
+            if precision_score != 0 or recall_score != 0:
+                fmeasure_score = 2 * ((precision_score * recall_score) / (precision_score + recall_score))
+            else:
+                fmeasure_score = 0
             overall_score = float(overall_response.choices[0].message.content)
             precision_col.append(precision_score)
             recall_col.append(recall_score)
@@ -74,8 +76,8 @@ class Evaluator:
             numeric_columns = self.dataframe.columns[2:]
         plt.figure(figsize=(12, 8))
         sns.boxplot(data=self.dataframe[numeric_columns])
-        plt.xticks(rotation=45)
-        plt.title('Box and Whisker Plot for Evaluation Metrics')
+        plt.xticks(rotation=20)
+        plt.title('Trained LLM Box and Whisker Plot for Evaluation Metrics')
         plt.show()
 
     def scatter(self):
@@ -83,7 +85,7 @@ class Evaluator:
         plt.scatter(self.dataframe['rouge_fmeasure'], self.dataframe['llm_fmeasure'], color='blue', label='ROUGE vs LLM')
         plt.xlabel('ROUGE F-measure')
         plt.ylabel('LLM F-measure')
-        plt.title('ROUGE F-measure vs LLM F-measure')
+        plt.title('Trained LLM ROUGE F-measure vs LLM F-measure')
         plt.grid(True)
         plt.legend()
         plt.show()
@@ -91,7 +93,7 @@ class Evaluator:
         plt.scatter(self.dataframe['bert_fmeasure'], self.dataframe['llm_fmeasure'], color='green', label='BERT vs LLM')
         plt.xlabel('BERT F-measure')
         plt.ylabel('LLM F-measure')
-        plt.title('BERT F-measure vs LLM F-measure')
+        plt.title('Trained LLM BERT F-measure vs LLM F-measure')
         plt.grid(True)
         plt.legend()
         plt.show()
@@ -99,7 +101,7 @@ class Evaluator:
         plt.scatter(self.dataframe['rouge_fmeasure'], self.dataframe['bert_fmeasure'], color='red', label='ROUGE vs BERT')
         plt.xlabel('ROUGE F-measure')
         plt.ylabel('BERT F-measure')
-        plt.title('ROUGE F-measure vs BERT F-measure')
+        plt.title('Trained LLM ROUGE F-measure vs BERT F-measure')
         plt.grid(True)
         plt.legend()
         plt.show()
